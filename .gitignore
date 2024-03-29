@@ -1,0 +1,11 @@
+danLib/
+.vs/
+.vscode/
+*.exe
+*.obj
+*.user
+*.pdb
+*.lib
+
+*.o
+*.so
