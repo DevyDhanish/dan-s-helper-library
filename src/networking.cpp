@@ -1,8 +1,10 @@
 #include "../include/networking/networking.hpp"
 #include "../include/networking/node.hpp"
 #include "../include/debug/debug.hpp"
+#include <string>
 #include <minwindef.h>
 #include <winsock2.h>
+#include <synchapi.h>
 
 void initNetworking()
 {
@@ -27,8 +29,14 @@ void initNetworking()
     consolelog<std::string>("Initialization of wsa successfull", CONSOLELOG::LOGTYPE::INFOLOG);
 }
 
-struct node createNode(const char *ip, const char *port, NETTYPE::IPTYPE iptype, NETTYPE::SOCKTYPE socktype)
+struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype, NETTYPE::SOCKTYPE socktype, uint32_t interval, uint32_t hostresolvetries)
 {
+
+    uint16_t portNumber = std::stoi(port);
+    if (portNumber <= 0 || portNumber > 65535) {
+		consolelog<std::string>("Invalid port number user", CONSOLELOG::ERRORLOG);
+		exit(0);
+	}
     struct node result{};
 
     uint16_t family = AF_INET;
@@ -67,11 +75,36 @@ struct node createNode(const char *ip, const char *port, NETTYPE::IPTYPE iptype,
         break;
     }
 
-    result = createNodeV4(ip, port, family, socktype, protocol);
+    addrinfo* serverAddr;
+	addrinfo hints;
+    RtlZeroMemory(&hints, sizeof(hints));
 
-    result.socket = socket(family, socktype, protocol);
+	hints.ai_family = family;
+	hints.ai_socktype = sockType;
+	hints.ai_protocol = protocol;
+	hints.ai_addrlen = 0;
+	hints.ai_canonname = 0;
+	hints.ai_addr = 0;
+	hints.ai_next = 0;
 
-    return result;
+    while(hostresolvetries)
+    {
+        int result = getaddrinfo(ip.c_str(), port.c_str(), &hints, &serverAddr);
+
+        if(result != 11001)
+        {
+            hostresolvetries = 0;
+            break;
+        }
+
+        consolelog("Host not found trying again tries remaning : " + std::string(hostresolvetries, 1), CONSOLELOG::INFOLOG);
+
+        hostresolvetries--;
+        Sleep(interval);
+    }
+
+
+    fillUpNode(&result, serverAddr, portNumber, ip);
 }
 
 void connectToNode(struct node *node)

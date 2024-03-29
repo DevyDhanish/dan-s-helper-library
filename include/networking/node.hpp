@@ -10,10 +10,10 @@
 
 struct node
 {
-	char ipv4[16];			// this is the ip getaddrinfo will give us
+	std::string hostname;			// this is the ip getaddrinfo will give us
 	unsigned short port;	// this port will only be filled with usefull info. if this node represents a server. clients will have this values as 0
 	unsigned long size;
-	char ip[16];			// this is the actual victims ip we got after the connect as made
+	std::string ip;			// this is the actual victims ip we got after the connect as made
 
 #ifdef _WIN32
 	sockaddr_in *socketAddr;
@@ -21,4 +21,4 @@ struct node
 #endif
 };
 
-struct node createNodeV4(const char* ipv4, const char *port, unsigned short family, unsigned short sockType, unsigned short protocol);
+void fillUpNode(struct node *node, addrinfo *result, uint16_t port, std::string hostname);
