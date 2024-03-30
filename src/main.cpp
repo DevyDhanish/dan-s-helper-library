@@ -15,11 +15,13 @@ int main()
 
 	node serverNode;
 
-	serverNode = createNode("localhost", "4444", NETTYPE::IPTYPE::IPV4, NETTYPE::SOCKTYPE::TCP, 5000, 5);
+	serverNode = createNode("localhost", "4444", NETTYPE::IPTYPE::IPV4, NETTYPE::SOCKTYPE::TCP, 5, 5);
 
 	std::vector<struct node *> nodes;
 
-	HANDLE threadId = listenOnNode(&serverNode, &nodes, 10, &onClientConnect);
+	//HANDLE threadId = listenOnNode(&serverNode, &nodes, 10, &onClientConnect);
+
+	consolelog(serverNode.ip, CONSOLELOG::INFOLOG);
 
 	std::string input;
 	while(1)

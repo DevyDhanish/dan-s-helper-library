@@ -108,7 +108,7 @@ struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype,
             break;
         }
 
-        Sleep(interval);
+        Sleep(interval * 1000);
     }
 
     if(serverAddr == NULL)
@@ -120,7 +120,7 @@ struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype,
     result.port = portNumber;
     result.socket = socket(serverAddr->ai_family, serverAddr->ai_socktype, serverAddr->ai_protocol);
     setsockopt(result.socket, SOL_SOCKET, SO_REUSEADDR | SO_EXCLUSIVEADDRUSE, (const char *)1, sizeof(int));
-
+    result.ip = ip;
     if(result.socket == INVALID_SOCKET)
     {
         consolelog("Invalid socket created", CONSOLELOG::ERRORLOG);
