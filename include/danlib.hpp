@@ -3,6 +3,7 @@
     so your don't have to include each one manually
     you can do that too if your want
 */
+#pragma once
 
 #include "debug/debug.hpp"
 #include "encryption/encryption.hpp"

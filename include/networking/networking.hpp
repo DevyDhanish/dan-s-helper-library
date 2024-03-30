@@ -21,6 +21,8 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <stdint.h>
+#include <string>
+#include <vector>
 
 namespace NETTYPE
 {
@@ -39,9 +41,9 @@ namespace NETTYPE
 
 void initNetworking();
 
-struct node createNode(const char *ip, const char *port, NETTYPE::IPTYPE iptype, NETTYPE::SOCKTYPE socktype);
+struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype, NETTYPE::SOCKTYPE socktype, uint32_t interval, uint32_t hostresolvetries);
 
-void listenOnNode();
+HANDLE listenOnNode(struct node *node, std::vector<struct node *> *nodes, int maxcon, void (*callback)(struct node *node));
 
 void connectToNode(struct node *node);
 

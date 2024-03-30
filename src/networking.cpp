@@ -5,6 +5,7 @@
 #include <minwindef.h>
 #include <winsock2.h>
 #include <synchapi.h>
+#include <vector>
 
 void initNetworking()
 {
@@ -87,24 +88,48 @@ struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype,
 	hints.ai_addr = 0;
 	hints.ai_next = 0;
 
+    const char *iptouse = ip.c_str();
+    const char *porttouse = port.c_str();
+
     while(hostresolvetries)
     {
-        int result = getaddrinfo(ip.c_str(), port.c_str(), &hints, &serverAddr);
+        int result = getaddrinfo(iptouse, porttouse, &hints, &serverAddr);
+        result = WSAGetLastError();
 
-        if(result != 11001)
+        if(result == 11001){    // host not found try again
+            consolelog("Host not found trying again", CONSOLELOG::INFOLOG);
+
+            hostresolvetries--;
+        }
+
+        if(result == 0)
         {
             hostresolvetries = 0;
             break;
         }
 
-        consolelog("Host not found trying again tries remaning : " + std::string(hostresolvetries, 1), CONSOLELOG::INFOLOG);
-
-        hostresolvetries--;
         Sleep(interval);
     }
 
+    if(serverAddr == NULL)
+    {
+        consolelog("DNS was resolved but no sockaddr was found", CONSOLELOG::ERRORLOG);
+        exit(0);
+    }
+
+    result.port = portNumber;
+    result.socket = socket(serverAddr->ai_family, serverAddr->ai_socktype, serverAddr->ai_protocol);
+    setsockopt(result.socket, SOL_SOCKET, SO_REUSEADDR | SO_EXCLUSIVEADDRUSE, (const char *)1, sizeof(int));
+
+    if(result.socket == INVALID_SOCKET)
+    {
+        consolelog("Invalid socket created", CONSOLELOG::ERRORLOG);
+        exit(0);
+    }
 
     fillUpNode(&result, serverAddr, portNumber, ip);
+
+    return result;
 }
 
 void connectToNode(struct node *node)
@@ -128,4 +153,73 @@ void sendToNode(struct node *node, const uint8_t *buffer, const uint32_t size)
 void recvFromNode(struct node *node, uint8_t *buffer, const uint32_t size)
 {
     recv(node->socket, (char *)buffer, size, 0);
+}
+
+struct __L_A_A_ARGS
+{
+    struct node *node;
+    std::vector<struct node *> *nodes; 
+    int maxcon;
+    void (*callback)(struct node *node);
+};
+
+static void __listen__and__accecpt(struct __L_A_A_ARGS *args)
+{   
+    consolelog("Created listening thread", CONSOLELOG::DEBUGLOG);
+
+    if(args->node->socket == INVALID_SOCKET)
+    {
+        consolelog("node's socket is invalid", CONSOLELOG::ERRORLOG);
+        exit(0);
+    }
+    
+    int result  = listen(args->node->socket, 1);
+
+    if(result == SOCKET_ERROR)
+    {
+        consolelog("Listen() return error code ", CONSOLELOG::ERRORLOG);
+        consolelog(WSAGetLastError(), CONSOLELOG::ERRORLOG);
+    }
+
+    sockaddr_in *clietSockAdrr = new sockaddr_in;
+    int Csize = sizeof(sockaddr_in);
+
+    while(args->nodes->size() < args->maxcon)
+    {
+        SOCKET clientSocket = accept(args->node->socket, (sockaddr *)clietSockAdrr, &Csize);
+        //consolelog("I'm working", CONSOLELOG::DEBUGLOG);
+        if(clientSocket != INVALID_SOCKET)
+        {
+            struct node *clientNode =  new struct node;
+            clientNode->socket = clientSocket;
+            clientNode->socketAddr = clietSockAdrr;
+            clientNode->size = Csize;
+            int size = sizeof(clientNode->socketAddr);
+            args->nodes->push_back(clientNode);
+            args->callback(clientNode);
+        }
+    }
+}
+
+HANDLE listenOnNode(struct node *node, std::vector<struct node *> *nodes, int maxcon, void (*callback)(struct node *node))
+{
+    struct __L_A_A_ARGS *args = new __L_A_A_ARGS;
+    args->maxcon = maxcon;
+    args->node = node;
+    args->nodes = nodes;
+    args->callback = callback;
+
+    int result = bind(node->socket, (sockaddr *)node->socketAddr, sizeof(*node->socketAddr));
+
+	if(result == SOCKET_ERROR)
+	{
+		consolelog("bind() failed", CONSOLELOG::ERRORLOG);
+		consolelog(WSAGetLastError(), CONSOLELOG::ERRORLOG);
+		exit(0);
+	}
+
+    DWORD threadid = 0;
+    HANDLE thread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) __listen__and__accecpt, args, 0, &threadid);
+
+    return thread;
 }

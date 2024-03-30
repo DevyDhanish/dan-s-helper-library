@@ -9,7 +9,6 @@ void fillUpNode(struct node *node, addrinfo *result, uint16_t port, std::string 
 {
 	node->socketAddr = (sockaddr_in *) result->ai_addr;
 	node->size = result->ai_addrlen;
-	node->socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	node->port = port;
 	node->hostname = hostname;
 }
