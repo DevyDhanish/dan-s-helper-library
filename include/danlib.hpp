@@ -11,3 +11,5 @@
 #include "networking/node.hpp"
 #include "serialize/serialize.hpp"
 #include "utils/utils.hpp"
+
+#define DEFAULT_DATA_LEN 1024

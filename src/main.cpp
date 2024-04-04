@@ -1,12 +1,9 @@
 #include "../include/danlib.hpp"
 #include <vector>
 
-void onClientConnect(struct node *clientNode)
+void onDataRecv(char *buffer, uint32_t size)
 {
-	char ip[255];
-	memset(ip, '\0', sizeof(ip));
-	recvFromNode(clientNode, (uint8_t *)ip, sizeof(ip));
-	consolelog(ip, CONSOLELOG::INFOLOG);
+	consolelog(buffer, CONSOLELOG::DEBUGLOG);
 }
 
 int main()
@@ -15,22 +12,13 @@ int main()
 
 	node serverNode;
 
-	serverNode = createNode("localhost", "4444", NETTYPE::IPTYPE::IPV4, NETTYPE::SOCKTYPE::TCP, 5, 5);
+	serverNode = createNode("0.tcp.in.ngrok.io", "14794", NETTYPE::IPTYPE::IPV4, NETTYPE::SOCKTYPE::TCP, 5, 5);
 
-	std::vector<struct node *> nodes;
+	connectToNode(&serverNode);
 
-	//HANDLE threadId = listenOnNode(&serverNode, &nodes, 10, &onClientConnect);
+	HANDLE recvThread = recvFromNode(&serverNode, &onDataRecv);
 
-	consolelog(serverNode.ip, CONSOLELOG::INFOLOG);
-
-	std::string input;
-	while(1)
-	{
-		// wast time
-		std::cout << "> ";
-		std::getline(std::cin, input);
-		consolelog(input, CONSOLELOG::DEBUGLOG);
-	}
+	while(1) {}
 
 	return 0;
 }

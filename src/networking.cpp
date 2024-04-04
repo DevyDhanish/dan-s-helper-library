@@ -1,6 +1,7 @@
 #include "../include/networking/networking.hpp"
 #include "../include/networking/node.hpp"
 #include "../include/debug/debug.hpp"
+#include "../include/danlib.hpp"
 #include <string>
 #include <minwindef.h>
 #include <winsock2.h>
@@ -150,9 +151,49 @@ void sendToNode(struct node *node, const uint8_t *buffer, const uint32_t size)
     send(node->socket, (const char *)buffer, size, 0);
 }
 
-void recvFromNode(struct node *node, uint8_t *buffer, const uint32_t size)
+struct __RD_ARGS
 {
-    recv(node->socket, (char *)buffer, size, 0);
+    char *buffer;
+    uint32_t size;
+    struct node *node;
+    void (*callback)(char *buffer, uint32_t size);
+};
+
+static void __recv__data(struct __RD_ARGS *args)
+{
+    int result = 0;
+    while(result != SOCKET_ERROR)
+    {
+        consolelog("WOrking", CONSOLELOG::DEBUGLOG);
+        result = recv(args->node->socket, args->buffer, args->size, 0);
+
+        if(result == 0)
+        {
+            break;
+        }
+        else
+        {
+            args->callback(args->buffer, args->size);
+            memset(args->buffer, '\0', args->size);
+        }
+    }
+}
+
+HANDLE recvFromNode(struct node *node, void (*callback)(char *buffer, uint32_t size))
+{
+    char *buff = new char[DEFAULT_DATA_LEN];
+    memset(buff, '\0', DEFAULT_DATA_LEN);
+
+    struct __RD_ARGS *args = new __RD_ARGS;
+    args->buffer = buff;
+    args->node = node;
+    args->size  = DEFAULT_DATA_LEN;
+    args->callback = callback;
+
+    DWORD threadid;
+    HANDLE thread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)&__recv__data, args, 0, &threadid);
+
+    return thread;
 }
 
 struct __L_A_A_ARGS

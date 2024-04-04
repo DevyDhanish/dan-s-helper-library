@@ -15,5 +15,3 @@ debug:
 	$(CC) src/main.cpp /link $(BUILD)/danlib.lib $(DEFAULT_DEPENDS) /OUT:$(BUILD)/test.exe
 
 	rm *.obj
-
-	build/test.exe
