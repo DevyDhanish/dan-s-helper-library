@@ -12,6 +12,4 @@ debug:
 
 	lib /OUT:$(BUILD)/danlib.lib encryption.obj node.obj serialize.obj utils.obj networking.obj
 
-	$(CC) src/main.cpp /link $(BUILD)/danlib.lib $(DEFAULT_DEPENDS) /OUT:$(BUILD)/test.exe
-
 	rm *.obj

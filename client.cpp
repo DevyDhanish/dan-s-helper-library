@@ -1,9 +1,9 @@
-#include "../include/danlib.hpp"
+#include "include/danlib.hpp"
 #include <vector>
 
 void onDataRecv(char *buffer, uint32_t size)
 {
-	std::vector<std::string> word = splitIntoVector(buffer, ';', size);
+	consolelog(buffer, CONSOLELOG::DEBUGLOG);
 }
 
 int main()

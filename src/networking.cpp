@@ -119,8 +119,10 @@ struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype,
     }
 
     result.port = portNumber;
+
     result.socket = socket(serverAddr->ai_family, serverAddr->ai_socktype, serverAddr->ai_protocol);
     setsockopt(result.socket, SOL_SOCKET, SO_REUSEADDR | SO_EXCLUSIVEADDRUSE, (const char *)1, sizeof(int));
+
     result.ip = ip;
     if(result.socket == INVALID_SOCKET)
     {
@@ -213,7 +215,7 @@ static void __listen__and__accecpt(struct __L_A_A_ARGS *args)
         exit(0);
     }
     
-    int result  = listen(args->node->socket, 1);
+    int result  = listen(args->node->socket, args->maxcon);
 
     if(result == SOCKET_ERROR)
     {
