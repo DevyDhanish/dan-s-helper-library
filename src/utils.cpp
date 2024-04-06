@@ -2,6 +2,8 @@
 #include "../include/debug/debug.hpp"
 #include <Windows.h>
 #include <iostream>
+#include <vector>
+#include <string>
 
 const char alphabets[26 + 26 + 1] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -46,4 +48,28 @@ void __print__banner(CONSOLELOG::LOGTYPE type)
 		break;
 	}
    }
+}
+
+std::vector<std::string> splitIntoVector(const char *str, char point, uint32_t size)
+{
+	std::vector<std::string> output;
+	std::string word = "";
+
+	uint32_t i = 0;
+	while(i <= size)		// using `<=` because then it will go upto the end of the input `adfasdfadsfsd;` every input should end with `;`.
+	{
+		if(str[i] == point)
+		{
+			output.push_back(word);
+			word = "";
+		}
+		else
+		{
+			word += str[i];
+		}
+
+		i++;
+	}
+
+	return output;
 }

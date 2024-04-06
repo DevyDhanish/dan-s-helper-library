@@ -1,5 +1,6 @@
 #pragma once
-
+#include <string>
+#include <vector>
 // contain alphabets 26 for lower and 26 for upper.
 // abcd...z...ABCD...Z
 extern const char alphabets[26 + 26 + 1];
@@ -11,3 +12,5 @@ extern const char numbers[10 + 1];
 extern const char symbols[35 + 1];
 
 extern const char allChars[100];
+
+std::vector<std::string> splitIntoVector(const char *str, char point, uint32_t size);

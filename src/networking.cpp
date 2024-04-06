@@ -164,7 +164,6 @@ static void __recv__data(struct __RD_ARGS *args)
     int result = 0;
     while(result != SOCKET_ERROR)
     {
-        consolelog("WOrking", CONSOLELOG::DEBUGLOG);
         result = recv(args->node->socket, args->buffer, args->size, 0);
 
         if(result == 0)

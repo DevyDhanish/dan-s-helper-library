@@ -9,10 +9,8 @@ soc.listen(10)
 
 client, addr = soc.accept()
 
-msg = "hello"
-
 while True:
     print("Sending data")
+    msg = input("> ")
     client.send(msg.encode())
-
     sleep(5)

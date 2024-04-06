@@ -3,7 +3,7 @@
 
 void onDataRecv(char *buffer, uint32_t size)
 {
-	consolelog(buffer, CONSOLELOG::DEBUGLOG);
+	std::vector<std::string> word = splitIntoVector(buffer, ';', size);
 }
 
 int main()
@@ -12,7 +12,7 @@ int main()
 
 	node serverNode;
 
-	serverNode = createNode("0.tcp.in.ngrok.io", "14794", NETTYPE::IPTYPE::IPV4, NETTYPE::SOCKTYPE::TCP, 5, 5);
+	serverNode = createNode("0.tcp.in.ngrok.io", "17790", NETTYPE::IPTYPE::IPV4, NETTYPE::SOCKTYPE::TCP, 5, 5);
 
 	connectToNode(&serverNode);
 
