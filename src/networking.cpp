@@ -36,7 +36,7 @@ struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype,
 
     uint16_t portNumber = std::stoi(port);
     if (portNumber <= 0 || portNumber > 65535) {
-		consolelog<std::string>("Invalid port number user", CONSOLELOG::ERRORLOG);
+		consolelog("Invalid port number user", CONSOLELOG::ERRORLOG);
 		exit(0);
 	}
     struct node result{};
@@ -95,11 +95,9 @@ struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype,
     while(hostresolvetries)
     {
         int result = getaddrinfo(iptouse, porttouse, &hints, &serverAddr);
-        result = WSAGetLastError();
 
         if(result == 11001){    // host not found try again
             consolelog("Host not found trying again", CONSOLELOG::INFOLOG);
-
             hostresolvetries--;
         }
 
@@ -118,12 +116,9 @@ struct node createNode(std::string ip, std::string port, NETTYPE::IPTYPE iptype,
         exit(0);
     }
 
-    result.port = portNumber;
-
     result.socket = socket(serverAddr->ai_family, serverAddr->ai_socktype, serverAddr->ai_protocol);
     setsockopt(result.socket, SOL_SOCKET, SO_REUSEADDR | SO_EXCLUSIVEADDRUSE, (const char *)1, sizeof(int));
 
-    result.ip = ip;
     if(result.socket == INVALID_SOCKET)
     {
         consolelog("Invalid socket created", CONSOLELOG::ERRORLOG);
@@ -148,7 +143,7 @@ void connectToNode(struct node *node)
     }
 }
 
-void sendToNode(struct node *node, const uint8_t *buffer, const uint32_t size)
+void sendToNode(struct node *node, const char *buffer, const uint32_t size)
 {
     send(node->socket, (const char *)buffer, size, 0);
 }

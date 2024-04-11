@@ -1,9 +1,5 @@
 #include "../include/networking/node.hpp"
 #include "../include/debug/debug.hpp"
-#include <WS2tcpip.h>
-#include <stdio.h>
-#include <synchapi.h>
-#include <string>
 
 void fillUpNode(struct node *node, addrinfo *result, uint16_t port, std::string hostname)
 {

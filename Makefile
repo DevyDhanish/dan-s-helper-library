@@ -13,3 +13,9 @@ debug:
 	lib /OUT:$(BUILD)/danlib.lib encryption.obj node.obj serialize.obj utils.obj networking.obj
 
 	rm *.obj
+
+client:
+	cl client.cpp /link build/danlib.lib $(DEFAULT_DEPENDS) /out:poison.exe
+
+server:
+	cl server.cpp /link build/danlib.lib $(DEFAULT_DEPENDS) /out:viper.exe

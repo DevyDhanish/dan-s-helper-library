@@ -1,15 +1,37 @@
 #include "include/danlib.hpp"
 #include <vector>
 #include <iostream>
+#include <fstream>
+
+void onDataRecv(char *buffer, uint32_t size)
+{
+    // std::vector<std::string> cmdData = splitIntoVector((const char *)buffer, ';', size);
+
+    // for(const std::string &word : cmdData)
+    // {
+    //     consolelog(word, CONSOLELOG::DEBUGLOG);
+    // }
+
+    // if(cmdData[0] == "cncRemote")
+    // {
+    //     consolelog("Viper's Remote has been Connected", CONSOLELOG::DEBUGLOG);
+    // }
+
+    std::ofstream outFile("recv.png", std::ios::binary);
+    if (!outFile.is_open()) {
+        std::cerr << "Failed to create output file." << std::endl; // Clean up allocated memory before exiting
+    }
+    outFile.write(buffer, size);
+    outFile.close();
+
+    // Remember to free the allocated memory
+}
 
 void onClientConnect(node *clientNode)
 {
-    while(1)
-    {
-        const char buffer[1024] = "sup my niggas msgbox; niggas are you ok; alsdkjf\n";
-        sendToNode(clientNode, (uint8_t *) buffer, sizeof(buffer));
-        Sleep(3000);
-    }
+    consolelog("Client connected", CONSOLELOG::DEBUGLOG);
+
+    recvFromNode(clientNode, &onDataRecv);
 }
 
 int main()

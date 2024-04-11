@@ -49,4 +49,4 @@ void connectToNode(struct node *node);
 
 HANDLE recvFromNode(struct node *node, void (*callback)(char *buffer, uint32_t size));
 
-void sendToNode(struct node *node, const uint8_t* buffer, const uint32_t size);
+void sendToNode(struct node *node, const char *buffer, const uint32_t size);
